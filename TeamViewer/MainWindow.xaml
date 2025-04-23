@@ -6,7 +6,27 @@
         xmlns:local="clr-namespace:TeamViewer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
+        <Button
+            Content="Take Screenshot"
+            Width="120"
+            Height="30"
+            Grid.Column="0"
+            HorizontalAlignment="Left"
+            Click="screenshot_Button"/>
+
+        <Button
+            x:Name="start_Rec_Btn"
+            Content="start"
+            Width="120"
+            Height="30"
+            Grid.Column="1"
+            HorizontalAlignment="Right"
+            Click="record_Button"/>
     </Grid>
 </Window>
