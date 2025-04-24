@@ -27,6 +27,6 @@
             Height="30"
             Grid.Column="1"
             HorizontalAlignment="Right"
-            Click="record_Button"/>
+            Click="rec_Btn_listener"/>
     </Grid>
 </Window>
