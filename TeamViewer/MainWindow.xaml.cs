@@ -1,19 +1,20 @@
-﻿using System.Windows;
-using System.Drawing;
-using System.Threading.Tasks;
+﻿using System.Drawing;
+using System.Windows;
 
 namespace TeamViewer
 {
     
     public partial class MainWindow : Window
     {
-
+        private TCPClient? _tcpClient;
         public MainWindow()
         {
             InitializeComponent();
+
+            _tcpClient = new TCPClient();
         }
 
-        private void rec_Btn_listener(object sender, RoutedEventArgs e)
+        private void rec_Btn(object sender, RoutedEventArgs e)
         {
             Record.record_Button(sender, e, start_Rec_Btn);
         }
@@ -22,6 +23,22 @@ namespace TeamViewer
         { 
             make_Screenshot();
             MessageBox.Show("screenshot is gemaakt");
+        }
+
+        public void connect_To_TcpServer(object sender, RoutedEventArgs e)
+        {
+            int port = int.Parse(inputPort.Text);
+            string ip = inputServer.Text;
+
+
+            _tcpClient.Connect(ip, port);
+
+        }
+
+        private void stop_Connection_To_TcpServer(object sender, RoutedEventArgs e)
+        {
+            
+            _tcpClient.stop_Connection();
         }
 
         private void make_Screenshot()

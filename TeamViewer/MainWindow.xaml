@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TeamViewer"
         mc:Ignorable="d"
+        xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
         Title="MainWindow" Height="450" Width="800">
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
@@ -17,16 +18,36 @@
             Width="120"
             Height="30"
             Grid.Column="0"
-            HorizontalAlignment="Left"
             Click="screenshot_Button"/>
 
-        <Button
-            x:Name="start_Rec_Btn"
-            Content="start"
-            Width="120"
-            Height="30"
-            Grid.Column="1"
-            HorizontalAlignment="Right"
-            Click="rec_Btn_listener"/>
+        <StackPanel Margin="20" Grid.Column="1" VerticalAlignment="Center">
+            <toolkit:WatermarkTextBox x:Name="inputPort" Watermark="Default Port: 13000" Margin="0 0 0 10" Width="120"/>
+            <toolkit:WatermarkTextBox x:Name="inputServer" Watermark="DefaultIp: 127.0.0.1" Margin="0 0 0 10" Width="120"/>
+            <Button
+                Content="Start Connection"
+                Width="100"
+                Height="30"
+                Click="connect_To_TcpServer"
+                Margin="0 0 0 10"/>
+
+            <Button
+                Content="Stop Connection"
+                Width="100"
+                Height="30"
+                Click="stop_Connection_To_TcpServer"
+                Margin="0 0 0 25"/>
+
+            <Button 
+                x:Name="start_Rec_Btn"
+                Content="start"
+                Width="120"
+                Height="30"
+                Grid.Column="1"
+                Click="rec_Btn"
+                />
+        </StackPanel>
+
+        
+        
     </Grid>
 </Window>

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TCPServer
 {
     public class TCPServer
     {
-        private TcpListener server = null;
+        private TcpListener? server = null;
+        private TcpClient? _client;
 
         public TCPServer()
         {
@@ -26,34 +22,54 @@ namespace TCPServer
 
             server.Start();
 
-            Byte[] buffer = new Byte[256];
-            string data;
-
             while (true)
             {
                 Console.Write("Waiting for a connection... ");
 
-                using TcpClient client = server.AcceptTcpClient();
+                _client = server.AcceptTcpClient();
                 Console.WriteLine("Connected!");
 
-                data = null;
+                _client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
+
+
+
+                handle_Client(_client);
+            }
+        }
+
+        private void handle_Client(TcpClient client)
+        {
+            Byte[] buffer = new Byte[256];
+            string data;
+
+            try
+            {
                 NetworkStream stream = client.GetStream();
-
+                
                 int i;
 
-                while ((i = stream.Read(buffer, 0, buffer.Length)) != 0)
+                while ((i = client.GetStream().Read(buffer, 0, buffer.Length)) != 0)
                 {
                     data = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
-
                     if (!string.IsNullOrWhiteSpace(data))
                     {
                         Console.WriteLine("Received: {0}", data);
                         byte[] msg = System.Text.Encoding.ASCII.GetBytes("Received Succesfully!");
-                        stream.Write(msg, 0, msg.Length);
+                        client.GetStream().Write(msg, 0, msg.Length);
                         Console.WriteLine("sent: {0}", System.Text.Encoding.ASCII.GetString(msg));
                     }
                 }
+                
+                Console.WriteLine("Client disconnected");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Connection error: " + ex.Message);
+            }
+            finally
+            {
+                client.Close();
             }
         }
     }
