@@ -1,23 +1,30 @@
 ﻿using System.Drawing;
 using System.Windows;
+using System.Runtime.InteropServices;
 
 namespace TeamViewer
 {
-    
     public partial class MainWindow : Window
     {
+        [DllImport("kernel32.dll")]
+        public static extern bool AllocConsole();
+
         private TCPClient? _tcpClient;
         public MainWindow()
         {
             InitializeComponent();
+            AllocConsole();
 
             _tcpClient = new TCPClient();
         }
 
-        private void rec_Btn(object sender, RoutedEventArgs e)
+        private async void rec_Btn(object sender, RoutedEventArgs e)
         {
-            Record.record_Button(sender, e, start_Rec_Btn);
+            await Record.record_Button(sender, e, start_Rec_Btn, _tcpClient);
+            
+            
         }
+
 
         private void screenshot_Button(object sender, RoutedEventArgs e)
         { 
@@ -25,13 +32,17 @@ namespace TeamViewer
             MessageBox.Show("screenshot is gemaakt");
         }
 
-        public void connect_To_TcpServer(object sender, RoutedEventArgs e)
+        private async void connect_To_TcpServer(object sender, RoutedEventArgs e)
         {
             int port = int.Parse(inputPort.Text);
             string ip = inputServer.Text;
 
 
-            _tcpClient.Connect(ip, port);
+            bool connected = await _tcpClient.Connect(ip, port);
+            if (!connected)
+            {
+                MessageBox.Show("Could not connect to server.");
+            }
 
         }
 
