@@ -16,48 +16,63 @@ namespace TCPServer
 
         private void start_Server()
         {
-            int port = 13000;
-            IPAddress local_Ip = IPAddress.Parse("127.0.0.1");
+            IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress ipAddr = ipHost.AddressList[0];
 
-            server = new TcpListener(local_Ip, port);
+            Console.WriteLine("IP Address: " + ipAddr.ToString());
+            Console.WriteLine("Host Name: " + ipHost.HostName.ToString());
 
-            server.Start();
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddr, 13000);
 
-            while (true)
-            {
-                Console.Write("Waiting for a connection... ");
+            Console.WriteLine("Local End Point: " + localEndPoint.ToString());
 
-                _client = server.AcceptTcpClient();
-                Console.WriteLine("Connected!");
+            Socket listener = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-                _client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+            try 
+            { 
+                listener.Bind(localEndPoint);
 
+                listener.Listen(10);
 
+                while (true)
+                {
+                    Console.Write("Waiting for a connection... ");
 
+                    Socket clientSocket = listener.Accept();
+                    Console.WriteLine("Connected!");
 
-                handle_Client(_client);
+                    //_client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+
+                    handle_Client(clientSocket);
+                }
             }
+            catch
+            {
+
+            }
+
+
         }
 
-        private void handle_Client(TcpClient client)
+        private void handle_Client(Socket clientSocket)
         {
             Byte[] buffer = new Byte[256];
             string data;
 
             try
             {
-                NetworkStream stream = client.GetStream();
+                NetworkStream stream = clientSocket.Receive();
                 
                 int i;
 
-                while ((i = client.GetStream().Read(buffer, 0, buffer.Length)) != 0)
+                while ((i = clientSocket.GetStream().Read(buffer, 0, buffer.Length)) != 0)
                 {
                     data = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
                     if (!string.IsNullOrWhiteSpace(data))
                     {
                         Console.WriteLine("Received: {0}", data);
                         byte[] msg = System.Text.Encoding.ASCII.GetBytes("Received Succesfully!");
-                        client.GetStream().Write(msg, 0, msg.Length);
+                        clientSocket.GetStream().Write(msg, 0, msg.Length);
                         Console.WriteLine("sent: {0}", System.Text.Encoding.ASCII.GetString(msg));
                     }
                 }
