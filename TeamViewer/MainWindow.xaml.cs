@@ -20,7 +20,7 @@ namespace TeamViewer
 
         private async void rec_Btn(object sender, RoutedEventArgs e)
         {
-            await Record.record_Button(sender, e, start_Rec_Btn, _tcpClient);
+            Record.ToggleRecording(start_Rec_Btn, _tcpClient);
             
             
         }

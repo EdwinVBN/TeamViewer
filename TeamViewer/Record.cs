@@ -8,21 +8,38 @@ namespace TeamViewer
     public class Record
     {
         private static bool recording_Btn_Is_Active = false;
-        public static async Task record_Button(object sender, RoutedEventArgs e, Button btn, TCPClient tcpClient)
+        private static CancellationTokenSource? _cts;
+        private static Task? _recordingTask;
+        public static void ToggleRecording(Button btn, TCPClient tcpClient)
         {
-            //int i = 0;
-            recording_Btn_Is_Active = !recording_Btn_Is_Active;
-            btn.Content = recording_Btn_Is_Active ? "Stop" : "Start";
-            //Connect("127.0.0.1");
-
-            while (recording_Btn_Is_Active)
+            if (_recordingTask != null && !_recordingTask.IsCompleted)
             {
-                byte[] imageBytes = record_Screen();
-                await tcpClient.SendMessage(imageBytes);
-                //i++;
-                //string msg = $"test {i}";
-                //Connect("127.0.0.1", msg);
-                await Task.Delay(33);
+                // Stop recording
+                _cts?.Cancel();
+                btn.Content = "Start";
+            }
+            else
+            {
+                // Start recording
+                _cts = new CancellationTokenSource();
+                btn.Content = "Stop";
+
+                _recordingTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        while (!_cts.Token.IsCancellationRequested)
+                        {
+                            byte[] imageBytes = record_Screen();
+                            await tcpClient.SendMessage(imageBytes);
+                            await Task.Delay(33, _cts.Token); // ~30 FPS
+                        }
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        // Gracefully stop
+                    }
+                });
             }
         }
 

@@ -33,31 +33,15 @@ namespace TeamViewer
 
         public async Task SendMessage(byte[] image)
         {
-            if (_client != null && _client.Connected)
+            if (_client != null && _client.Connected && _stream != null)
             {
-                if (_stream != null)
-                {
-                    await _stream.WriteAsync(image, 0, image.Length);
-                }
-                else
-                {
-                    MessageBox.Show("Stream is not available. Maybe not connected?");
-                }
-                if (image != null)
-                {
-                    Console.WriteLine($"Sent {image.Length} bytes to server");
-                }
-                else
-                {
-                    Console.WriteLine("Image is null");
-                }
-                
-            }
-            else
-            {
-                MessageBox.Show("Not connected to server");
+                byte[] lengthPrefix = BitConverter.GetBytes(image.Length);
+                await _stream.WriteAsync(lengthPrefix, 0, lengthPrefix.Length);
+                await _stream.WriteAsync(image, 0, image.Length);
+                Console.WriteLine($"Sent {image.Length} bytes");
             }
         }
+
 
         public void stop_Connection()
         {
