@@ -61,18 +61,16 @@ namespace TCPServer
 
             try
             {
-                NetworkStream stream = clientSocket.Receive();
+                int stream = clientSocket.Receive(buffer);
                 
-                int i;
-
-                while ((i = clientSocket.GetStream().Read(buffer, 0, buffer.Length)) != 0)
+                while (stream != 0)
                 {
-                    data = System.Text.Encoding.ASCII.GetString(buffer, 0, i);
+                    data = System.Text.Encoding.ASCII.GetString(buffer);
                     if (!string.IsNullOrWhiteSpace(data))
                     {
                         Console.WriteLine("Received: {0}", data);
                         byte[] msg = System.Text.Encoding.ASCII.GetBytes("Received Succesfully!");
-                        clientSocket.GetStream().Write(msg, 0, msg.Length);
+                        clientSocket.Send(msg);
                         Console.WriteLine("sent: {0}", System.Text.Encoding.ASCII.GetString(msg));
                     }
                 }
@@ -85,7 +83,7 @@ namespace TCPServer
             }
             finally
             {
-                client.Close();
+                clientSocket.Close();
             }
         }
     }
