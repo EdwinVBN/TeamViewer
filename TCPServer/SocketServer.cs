@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
-using System.IO;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices.JavaScript;
+using System.Text;
 
 
 namespace TCPServer
@@ -70,20 +63,25 @@ namespace TCPServer
             string content = String.Empty;
             Objectstate state = (Objectstate) ar.AsyncState;
             Socket handler = state.workSocket;
-            int bytesRead = handler.EndReceive(ar);
-            if (bytesRead > 0)
+            try
             {
-                state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-                content = state.sb.ToString();
-                if (content.IndexOf("<EOF>", StringComparison.Ordinal) > -1)
-                {
-                    Console.WriteLine($"Read: {content.Length} bytes from \n socket Data: {content}");
-                    Send(handler, content);
+                int stream;
+
+                if((stream = handler.EndReceive(ar)) != 0){
+                    Console.WriteLine("Bytes ontvangen: " + stream);
+                    content = System.Text.Encoding.ASCII.GetString(state.buffer, 0, stream);
+                    if (!string.IsNullOrWhiteSpace(content))
+                    {
+                        Console.WriteLine("Received: {0}", content);
+                        string msg = "Received Succesfully!";
+                        Send(handler, msg);
+                    }
                 }
-                else
-                {
-                    handler.BeginReceive(state.buffer, 0, Objectstate.BufferSize, 0, new AsyncCallback(ReadCallback), state);
-                }
+                handler.BeginReceive(state.buffer, 0, Objectstate.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
