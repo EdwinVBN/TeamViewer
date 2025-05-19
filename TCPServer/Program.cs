@@ -7,7 +7,13 @@ namespace TCPServer
     {
         static void Main(string[] args)
         {
-            var server = new TCPServer();
-        }   
+            // oude normale sync server
+            //var server = new TCPServer();
+
+            // nieuwe async server
+            //Console.WriteLine("press any key to start server...");
+            //Console.ReadLine();
+            AsyncSocketServer.StartListener();
+        }
     }
 }
