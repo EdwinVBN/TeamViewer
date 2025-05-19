@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
@@ -61,11 +62,12 @@ namespace TCPServer
 
             try
             {
-                int stream = clientSocket.Receive(buffer);
+                // int stream = clientSocket.Receive(buffer);
+                int stream;
                 
-                while (stream != 0)
+                while ((stream = clientSocket.Receive(buffer)) != 0)
                 {
-                    data = System.Text.Encoding.ASCII.GetString(buffer);
+                    data = System.Text.Encoding.ASCII.GetString(buffer, 0, stream);
                     if (!string.IsNullOrWhiteSpace(data))
                     {
                         Console.WriteLine("Received: {0}", data);
@@ -74,7 +76,6 @@ namespace TCPServer
                         Console.WriteLine("sent: {0}", System.Text.Encoding.ASCII.GetString(msg));
                     }
                 }
-                
                 Console.WriteLine("Client disconnected");
             }
             catch (Exception ex)
